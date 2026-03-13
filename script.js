@@ -32,6 +32,7 @@ function loadFromLocalStorage(key, defaultValue) {
     }
 }
 
+// MAIN GENERATE FUNCTION - Called by slider/checkbox changes (NO HISTORY SAVE)
 function generatePassword() {
     const length = parseInt(document.getElementById('lengthSlider').value);
     const includeUppercase = document.getElementById('uppercase').checked;
@@ -75,15 +76,25 @@ function generatePassword() {
         [password[i], password[j]] = [password[j], password[i]];
     }
 
-    // Save to current field AND history
+    // ONLY save current password (NOT history)
     document.getElementById('password').value = password;
     saveToLocalStorage(STORAGE_KEYS.PASSWORD, password);
-    addToHistory(password, length);
-    
     updateStrength(password);
     saveSettings();
 }
 
+// BUTTON-ONLY FUNCTION - Saves to HISTORY
+function generateSecurePassword() {
+    generatePassword(); // Generate first
+    const password = document.getElementById('password').value;
+    const length = parseInt(document.getElementById('lengthSlider').value);
+    
+    // NOW add to history (only from button click)
+    addToHistory(password, length);
+    showToast('✅ Password saved to history!');
+}
+
+// History functions
 function addToHistory(password, length) {
     const history = loadFromLocalStorage(STORAGE_KEYS.HISTORY, []);
     const timestamp = new Date().toLocaleString();
@@ -91,7 +102,7 @@ function addToHistory(password, length) {
     // Avoid duplicates
     const exists = history.find(item => item.password === password);
     if (!exists) {
-        history.unshift({ password, length, timestamp }); // Add to beginning
+        history.unshift({ password, length, timestamp });
         // Keep only last 50 passwords
         if (history.length > 50) {
             history.length = 50;
@@ -110,7 +121,7 @@ function renderHistory() {
         historyList.innerHTML = `
             <div class="empty-state">
                 <p>No passwords saved yet</p>
-                <small>Generate some passwords to see them here!</small>
+                <small>Click "Generate Secure Password" to save!</small>
             </div>
         `;
     } else {
@@ -160,6 +171,7 @@ function usePassword(password, length) {
     document.getElementById('lengthSlider').value = length;
     document.getElementById('lengthDisplay').textContent = length;
     updateStrength(password);
+    showToast('Password loaded from history!');
 }
 
 function copyHistoryPassword(password) {
@@ -184,7 +196,6 @@ function clearHistory() {
 }
 
 function showToast(message) {
-    // Simple toast notification
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed; top: 20px; right: 20px; background: rgba(46, 213, 115, 0.95);
@@ -202,7 +213,7 @@ function showToast(message) {
     }, 2500);
 }
 
-// Existing functions (saveSettings, loadSettings, copyPassword, updateStrength remain the same)
+// Settings functions
 function saveSettings() {
     saveToLocalStorage(STORAGE_KEYS.LENGTH, parseInt(document.getElementById('lengthSlider').value));
     saveToLocalStorage(STORAGE_KEYS.UPPERCASE, document.getElementById('uppercase').checked);
@@ -232,7 +243,7 @@ function copyPassword() {
     const passwordField = document.getElementById('password');
     passwordField.select();
     passwordField.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(passwordField.value).then(() => {
+    navigator.clipboard.writeText(passwordField.value).then(() => {
         const btn = document.querySelector('.btn-copy');
         const originalText = btn.innerHTML;
         btn.innerHTML = '✅ Copied!';
@@ -304,19 +315,20 @@ function updateStrength(password) {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
-    renderHistory(); // Load history on page load
+    renderHistory();
     
     const lengthSlider = document.getElementById('lengthSlider');
     
     lengthSlider.addEventListener('input', function() {
         document.getElementById('lengthDisplay').textContent = this.value;
-        generatePassword();
+        generatePassword(); // Uses regular generate (no history)
     });
 
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', generatePassword);
+        checkbox.addEventListener('change', generatePassword); // Uses regular generate (no history)
     });
 
+    // Initial load
     if (!loadFromLocalStorage(STORAGE_KEYS.PASSWORD, '')) {
         generatePassword();
     }
@@ -328,7 +340,7 @@ document.addEventListener('keydown', function(e) {
     
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        generatePassword();
+        generateSecurePassword(); // Button-only version (saves to history)
     }
     if ((e.key === 'c' || e.key === 'C') && e.ctrlKey === false) {
         e.preventDefault();
@@ -336,10 +348,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Save before unload
 window.addEventListener('beforeunload', saveSettings);
-
-// Auto-generate if no password
 window.addEventListener('load', function() {
     if (!document.getElementById('password').value) {
         generatePassword();
