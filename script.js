@@ -354,3 +354,145 @@ window.addEventListener('load', function() {
         generatePassword();
     }
 });
+// Add these functions to your existing script.js
+
+// 1. Theme System
+function applyTheme(theme) {
+    document.body.className = theme;
+    saveToLocalStorage('password_generator_theme', theme);
+}
+
+document.getElementById('themeSelect').addEventListener('change', function() {
+    applyTheme(this.value);
+});
+
+// 2. QR Code Generator (needs QR library - CDN in HTML head)
+/* Add to HTML head: <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script> */
+
+function generateQR() {
+    const password = document.getElementById('password').value;
+    const canvas = document.getElementById('qrCanvas');
+    
+    QRCode.toCanvas(canvas, password, {
+        width: 150,
+        margin: 1,
+        color: {
+            dark: '#000000',
+            light: '#ffffff'
+        }
+    }, (error) => {
+        if (error) console.error(error);
+        else canvas.style.display = 'block';
+    });
+}
+
+// 3. Advanced Quality Score
+function calculateQualityScore(password) {
+    const lengthScore = Math.min(password.length * 4, 40);
+    const charsetScore = new Set(password).size * 2;
+    const entropy = calculateEntropy(password);
+    const patternScore = hasGoodPattern(password) ? 20 : 0;
+    
+    const total = Math.min((lengthScore + charsetScore + entropy + patternScore), 100);
+    document.getElementById('qualityScore').textContent = `${Math.round(total)}%`;
+    document.getElementById('entropyBits').textContent = `${Math.round(entropy)} bits`;
+    
+    return total;
+}
+
+function calculateEntropy(password) {
+    const charsetSize = new Set(password).size;
+    return password.length * Math.log2(charsetSize);
+}
+
+function hasGoodPattern(password) {
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNum = /\d/.test(password);
+    const hasSym = /[^A-Za-z0-9]/.test(password);
+    return hasUpper && hasLower && hasNum && hasSym;
+}
+
+// Update strength function to include quality
+const _updateStrength = updateStrength;
+updateStrength = function(password) {
+    _updateStrength(password);
+    calculateQualityScore(password);
+};
+
+// 4. Usage Analytics
+function updateAnalytics() {
+    const history = loadFromLocalStorage(STORAGE_KEYS.HISTORY, []);
+    const avgLength = history.length ? 
+        Math.round(history.reduce((sum, item) => sum + item.length, 0) / history.length) : 0;
+    
+    console.log(`📊 Stats: ${history.length} passwords, avg ${avgLength} chars`);
+}
+
+// 5. Export/Import
+function exportData() {
+    const data = {
+        history: loadFromLocalStorage(STORAGE_KEYS.HISTORY, []),
+        settings: {
+            length: loadFromLocalStorage(STORAGE_KEYS.LENGTH, 16),
+            uppercase: loadFromLocalStorage(STORAGE_KEYS.UPPERCASE, true),
+            lowercase: loadFromLocalStorage(STORAGE_KEYS.LOWERCASE, true),
+            numbers: loadFromLocalStorage(STORAGE_KEYS.NUMBERS, true),
+            symbols: loadFromLocalStorage(STORAGE_KEYS.SYMBOLS, true),
+            theme: loadFromLocalStorage('password_generator_theme', 'dark')
+        },
+        stats: {
+            totalGenerated: loadFromLocalStorage(STORAGE_KEYS.HISTORY, []).length,
+            exportDate: new Date().toISOString()
+        }
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `password-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Data exported! 💾');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.history) {
+                saveToLocalStorage(STORAGE_KEYS.HISTORY, data.history);
+                renderHistory();
+            }
+            if (data.settings) {
+                Object.keys(data.settings).forEach(key => {
+                    if (key === 'length') {
+                        document.getElementById('lengthSlider').value = data.settings[key];
+                        document.getElementById('lengthDisplay').textContent = data.settings[key];
+                    } else {
+                        const checkbox = document.getElementById(key);
+                        if (checkbox) checkbox.checked = data.settings[key];
+                    }
+                });
+                applyTheme(data.settings.theme || 'dark');
+            }
+            showToast('Data imported successfully! 🎉');
+            generatePassword();
+        } catch (err) {
+            alert('Invalid file format!');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Load theme on startup
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = loadFromLocalStorage('password_generator_theme', 'dark');
+    applyTheme(savedTheme);
+    updateAnalytics();
+});

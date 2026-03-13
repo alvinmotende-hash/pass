@@ -495,3 +495,148 @@ input[type="range"]::-moz-range-thumb {
         justify-content: flex-end;
     }
 }
+/* Theme Switcher */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+}
+
+#themeSelect {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* Advanced Row */
+.advanced-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.qr-section {
+    text-align: center;
+}
+
+#qrCanvas {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.btn-qr {
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    color: white;
+    padding: 12px 24px;
+}
+
+.stats-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+.stat-label {
+    color: #a0a8b0;
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #00d4ff, #7b68ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Export Section */
+.export-section {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.btn-export, .btn-import {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #2ed573, #1abc9c);
+    color: white;
+}
+
+.btn-import {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-export:hover, .btn-import:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Theme Variations */
+body.light {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #2d3748;
+}
+
+body.light .container {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+body.light #password {
+    color: #2d3748;
+}
+
+body.light .history-item:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+body.cyberpunk {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 50%, #000428 100%);
+}
+
+body.cyberpunk .container {
+    background: rgba(0,0,0,0.4);
+    border-color: #00ff88;
+    box-shadow: 0 0 50px rgba(0,255,136,0.3);
+}
+
+body.cyberpunk #password {
+    color: #00ff88;
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+}
+
+body.cyberpunk .generate-btn {
+    background: linear-gradient(135deg, #00ff88, #00cc6a);
+    box-shadow: 0 0 30px rgba(0,255,136,0.5);
+}

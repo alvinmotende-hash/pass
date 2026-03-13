@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔐 Secure Password Generator</title>
     <link rel="stylesheet" href="style.css">
+    <!-- QRCode.js CDN - ADDED ONLY THIS LINE -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -64,15 +66,51 @@
         </div>
 
         <!-- Generate Button -->
-<button class="generate-btn" onclick="generateSecurePassword()">
-    ✨ Generate Secure Password
-</button>
+        <button class="generate-btn" onclick="generateSecurePassword()">
+            ✨ Generate Secure Password
+        </button>
 
         <!-- Strength Meter -->
         <div class="strength-meter">
             <div class="strength-fill" id="strengthFill"></div>
         </div>
         <div class="strength-text" id="strengthText">Click Generate to analyze</div>
+        <!-- Add AFTER strength meter, BEFORE history section -->
+
+        <!-- Theme Switcher -->
+        <div class="theme-switcher">
+            <span>🎨 Theme:</span>
+            <select id="themeSelect">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="cyberpunk">Cyberpunk</option>
+            </select>
+        </div>
+
+        <!-- QR Code & Stats Row -->
+        <div class="advanced-row">
+            <div class="qr-section">
+                <canvas id="qrCanvas" style="display: none;"></canvas>
+                <button class="btn-qr" onclick="generateQR()">📱 QR Code</button>
+            </div>
+            <div class="stats-section">
+                <div class="stat-item">
+                    <span class="stat-label">Quality</span>
+                    <span class="stat-value" id="qualityScore">92%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Entropy</span>
+                    <span class="stat-value" id="entropyBits">296 bits</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export/Import -->
+        <div class="export-section">
+            <button class="btn-export" onclick="exportData()">💾 Export Data</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+            <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Import</button>
+        </div>
 
         <!-- Password History Section -->
         <div class="history-section">
