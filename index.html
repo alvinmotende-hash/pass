@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Secure Password Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Password Generator</h1>
+            <p class="subtitle">Create & manage strong, unique passwords</p>
+        </div>
+
+        <!-- Current Password -->
+        <div class="password-display">
+            <input type="text" id="password" readonly placeholder="Click Generate to create a password...">
+            <div class="password-actions">
+                <button class="btn btn-copy" onclick="copyPassword()">
+                    📋 Copy
+                </button>
+                <button class="btn btn-refresh" onclick="generatePassword()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options">
+            <div class="option-group">
+                <div class="option-label">
+                    <span>Length</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="lengthSlider" min="4" max="100" value="16">
+                    <div class="slider-labels">
+                        <span class="slider-min">4</span>
+                        <span class="length-display" id="lengthDisplay">16</span>
+                        <span class="slider-max">100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="checkboxes">
+            <label class="checkbox-item">
+                <input type="checkbox" id="uppercase" checked>
+                <span>🔠 Uppercase (A-Z)</span>
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="lowercase" checked>
+                <span>🔡 Lowercase (a-z)</span>
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="numbers" checked>
+                <span>🔢 Numbers (0-9)</span>
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="symbols" checked>
+                <span>🔣 Symbols (!@#$%)</span>
+            </label>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="generate-btn" onclick="generatePassword()">
+            ✨ Generate Secure Password
+        </button>
+
+        <!-- Strength Meter -->
+        <div class="strength-meter">
+            <div class="strength-fill" id="strengthFill"></div>
+        </div>
+        <div class="strength-text" id="strengthText">Click Generate to analyze</div>
+
+        <!-- Password History Section -->
+        <div class="history-section">
+            <div class="history-header">
+                <h3>📋 Password History</h3>
+                <div class="history-controls">
+                    <button class="btn-clear" onclick="clearHistory()">🗑️ Clear All</button>
+                    <span class="history-count" id="historyCount">0 saved</span>
+                </div>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-state">
+                    <p>No passwords saved yet</p>
+                    <small>Generate some passwords to see them here!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
